@@ -7,7 +7,7 @@ import PostCommentForm from './PostCommentForm';
 
 class PostCommentsView extends React.PureComponent {
   static propTypes = {
-    postId: PropTypes.number.isRequired,
+    postId: PropTypes.string.isRequired,
     comments: PropTypes.array.isRequired,
     comment: PropTypes.object,
     addComment: PropTypes.func.isRequired,

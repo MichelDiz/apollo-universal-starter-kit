@@ -1,4 +1,4 @@
-mutation deletePost($id: Int!) {
+mutation deletePost($id: String!) {
   deletePost(id: $id) {
     id
   }

@@ -47,7 +47,7 @@ function DeleteComment(prev, id) {
 
 class PostComments extends React.Component {
   static propTypes = {
-    postId: PropTypes.number.isRequired,
+    postId: PropTypes.string.isRequired,
     comments: PropTypes.array.isRequired,
     comment: PropTypes.object.isRequired,
     onCommentSelect: PropTypes.func.isRequired,

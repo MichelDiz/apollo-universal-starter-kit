@@ -1,3 +1,38 @@
+# Apollo Universal Starter Kit With Dgraph DB
+
+## Description 
+
+It's a kind of "reverse engineering for beginners". I have modified some parts of this project to use Dgraph instead of Knex (SQL). The modifications do not cover everything. Only the User, and Post modules have been modified. Serving as an example for the other modules. (you need to do the recommend procedure by this project before seed for Dgraph, install all dependencies and then "yarn seed" so come back and continue the Dgraph setup - Please read the full readme of the kit, not just this part)
+
+To run this project with Dgraph you will need the Dgraph binaries or an accessible instance of the machine that will host this project. Running Docker or K8s.
+
+Download Dgraph bin in https://github.com/dgraph-io/dgraph/releases  </br>
+Check for Docker images in https://hub.docker.com/r/dgraph/dgraph/
+
+>For really beginners, do our Tour in http://tour.dgraph.io
+
+After downloading the bin, execute this commands (each one in one tab in the same path of the binarires):
+
+``` ./dgraph zero ``` </br>
+```./dgraph server --lru_mb 4005 -o 1 ``` #<== this is important because we will use a different port in Dgraph, since this project uses the same standard port as the Dgraph Server.
+
+You gonna have: </br>
+```
+Setting up grpc listener at: 0.0.0.0:5080 
+Setting up http listener at: 0.0.0.0:6080
+#AND
+2018/09/24 01:41:44 gRPC server started.  Listening on port 9081
+2018/09/24 01:41:44 HTTP server started.  Listening on port 8081
+```
+Now go to:
+>packages/server/src/dgraph/dgraphconnector.js
+
+and run the seed for Dgraph. Uncommenting the 125ª line. After first seed re-comment that line to not create more data. And now you can use this project with Dgraph already. Explore and enjoi to edit the other packages! xD
+
+-------------
+-------------
+-------------
+
 <p align="center"><a href="#"><img width="150" src="https://rawgit.com/sysgears/apollo-universal-starter-kit/master/logo.svg"></a></p>
 
 # Apollo Universal Starter Kit
@@ -27,22 +62,29 @@ styling for your applications.
 
 ## Table of Contents
 
-* [Overview](#overview)
-    * [Why Use Apollo Universal Starter Kit](#why-use-apollo-universal-starter-kit)
-    * [Concept](#concept)
-    * [Architecture and Implemented Modules](#architecture-and-implemented-modules)
-* [Demo](#demo)
-* [Branches](#branches)
-* [Download and Run Apollo Universal Starter Kit](#download-and-run-apollo-universal-starter-kit)
-* [Project Structure](#project-structure)
-* [Wiki Sections on Apollo Universal Starter Kit](#wiki-sections-on-apollo-universal-starter-kit)
-* [Support](#support)
-    * [Community Support](#community-support)
-    * [Commercial Support](#commercial-support)
-* [Contributors](#contributors)
-* [Backers](#backers)
-* [Sponsors](#sponsors)
-* [License Info](#license)
+- [Apollo Universal Starter Kit With Dgraph DB](#apollo-universal-starter-kit-with-dgraph-db)
+    - [Description](#description)
+- [Apollo Universal Starter Kit](#apollo-universal-starter-kit)
+    - [Description](#description)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+        - [Why Use Apollo Universal Starter Kit](#why-use-apollo-universal-starter-kit)
+            - [I Am a Developer](#i-am-a-developer)
+            - [I Am a Client](#i-am-a-client)
+        - [Concept](#concept)
+        - [Architecture and Implemented Modules](#architecture-and-implemented-modules)
+    - [Demo](#demo)
+    - [Branches](#branches)
+    - [First Run of Apollo Universal Starter Kit](#first-run-of-apollo-universal-starter-kit)
+    - [Project Structure](#project-structure)
+    - [Wiki Sections on Apollo Universal Starter Kit](#wiki-sections-on-apollo-universal-starter-kit)
+    - [Support](#support)
+        - [Community Support](#community-support)
+        - [Commercial Support](#commercial-support)
+    - [Contributors](#contributors)
+    - [Backers](#backers)
+    - [Sponsors](#sponsors)
+    - [License](#license)
 
 ## Overview 
 

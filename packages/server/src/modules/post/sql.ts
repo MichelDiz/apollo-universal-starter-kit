@@ -1,5 +1,6 @@
-import { returnId, orderedFor } from '../../sql/helpers';
+import { orderedFor } from '../../sql/helpers';
 import knex from '../../sql/connector';
+import { run_query, run_mutationInJSON, run_delInJSON } from '../../dgraph/dgraphconnector';
 
 export interface Post {
   title: string;
@@ -7,86 +8,164 @@ export interface Post {
 }
 
 export interface Comment {
-  postId: number;
+  postId: string;
   content: string;
 }
 
 export interface Identifier {
-  id: number;
+  id: string;
 }
 
 export default class PostDAO {
   public postsPagination(limit: number, after: number) {
-    return knex
-      .select('id', 'title', 'content')
-      .from('post')
-      .orderBy('id', 'desc')
-      .limit(limit)
-      .offset(after);
+    const query = `
+     { query(func: has(is_a_post), first:${limit}, offset:${after}, orderasc: created_at) {
+           #postsPagination
+           id : uid
+           title
+           content
+        }
+      }
+
+        `;
+    // console.log(query, "query")
+    const notArray = true;
+    const res = async () => run_query(query, notArray);
+    return res();
   }
 
-  public async getCommentsForPostIds(postIds: number[]) {
-    const res = await knex
-      .select('id', 'content', 'post_id AS postId')
-      .from('comment')
-      .whereIn('post_id', postIds);
+  public async getCommentsForPostIds(postIds: string[]) {
+    const query = `
+    {
+      var(func: uid(${postIds}) ){
+        Com as comments
+      }
+
+      query(func: uid(Com), orderasc: created_at) @normalize {
+        #postsPagination
+        id : uid
+        content: content
+      ~comments{
+        postId : uid
+      }
+     }
+    }
+       `;
+    // console.log(query, "query")
+    const notArray = true;
+    const res = await run_query(query, notArray);
 
     return orderedFor(res, postIds, 'postId', false);
   }
 
   public getTotal() {
-    return knex('post')
-      .countDistinct('id as count')
-      .first();
+    const query = `
+     { query(func: has(is_a_post) ) {
+           #getTotal
+       count(uid)
+        }}
+
+        `;
+    const notArray = true;
+    const res = async () => run_query(query, notArray);
+    return res();
   }
 
-  public post(id: number) {
-    return knex
-      .select('id', 'title', 'content')
-      .from('post')
-      .where('id', '=', id)
-      .first();
+  public post(id: any) {
+    const query = `
+     { query(func: uid("${id.id || id}") ) {
+           #post
+           id : uid
+           title
+           content
+        }}
+        `;
+    const notArray = true;
+    const res = async () => run_query(query, notArray);
+    return res();
   }
 
   public addPost(params: Post) {
-    return returnId(knex('post')).insert(params);
+    const returnUID = true;
+    const now = new Date().toISOString();
+    const p = {
+      is_a_post: '',
+      title: params.title,
+      content: params.content,
+      created_at: now
+    };
+    const res = async () => run_mutationInJSON(p, returnUID);
+    return res();
   }
 
   public deletePost(id: number) {
-    return knex('post')
-      .where('id', '=', id)
-      .del();
+    const p = {
+      uid: id
+    };
+
+    const res = async () => run_delInJSON(p);
+    return res();
   }
 
   public editPost({ id, title, content }: Post & Identifier) {
-    return knex('post')
-      .where('id', '=', id)
-      .update({ title, content });
+    const returnUID = true;
+    const now = new Date().toISOString();
+    const p = {
+      uid: id,
+      title,
+      content,
+      updated_at: now
+    };
+    const res = async () => run_mutationInJSON(p, returnUID);
+    return res();
   }
 
   public addComment({ content, postId }: Comment) {
-    return returnId(knex('comment')).insert({ content, post_id: postId });
+    const returnUID = true;
+    const now = new Date().toISOString();
+    const p = {
+      uid: postId,
+      comments: {
+        is_a_comment: '',
+        content,
+        created_at: now
+      }
+    };
+    const res = async () => run_mutationInJSON(p, returnUID);
+    return res();
   }
 
-  public getComment(id: number) {
-    return knex
-      .select('id', 'content')
-      .from('comment')
-      .where('id', '=', id)
-      .first();
+  public getComment(id: any) {
+    const query = `
+    {
+     query(func: uid("${id.id || id}") ) {
+          #getComment
+          id : uid
+          content
+       }}
+       `;
+    const notArray = true;
+    const res = async () => run_query(query, notArray);
+    return res();
   }
 
   public deleteComment(id: number) {
-    return knex('comment')
-      .where('id', '=', id)
-      .del();
+    const p = {
+      uid: id
+    };
+    const res = async () => run_delInJSON(p);
+    return res();
   }
 
   public editComment({ id, content }: Comment & Identifier) {
-    return knex('comment')
-      .where('id', '=', id)
-      .update({
-        content
-      });
+    const returnUID = true;
+    const now = new Date().toISOString();
+    const p = {
+      uid: id,
+      content,
+      updated_at: now
+    };
+    const res = async () => run_mutationInJSON(p, returnUID);
+    return res();
   }
 }

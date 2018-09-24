@@ -10,7 +10,8 @@ export const development = {
   migrations: {
     directory: './src/database/migrations'
   },
-  useNullAsDefault: true
+  useNullAsDefault: true,
+  debug: true
 };
 
 export const production = {

@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import { pick } from 'lodash';
 import jwt from 'jsonwebtoken';
 
@@ -9,7 +8,7 @@ import settings from '../../../../../../../settings';
 
 const validateUserPassword = async (user, password, t) => {
   const e = new FieldError();
-
+  let bucket;
   if (!user) {
     // user with provided email not found
     e.setError('usernameOrEmail', t('user:auth.password.validPasswordEmail'));
@@ -19,9 +18,18 @@ const validateUserPassword = async (user, password, t) => {
     e.setError('usernameOrEmail', t('user:auth.password.emailConfirmation'));
     e.throwIf();
   }
-
-  const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) {
+  console.log(user, 'user');
+  if (user) {
+    let arrayToObjectToCall = array =>
+      array.reduce((obj, item) => {
+        obj['password_hash'] = item;
+        return item;
+      }, {});
+    bucket = arrayToObjectToCall(user.password_hash);
+  } else {
+    bucket = undefined;
+  }
+  if (bucket && bucket.checkpwd === false) {
     // bad password
     e.setError('password', t('user:auth.password.validPassword'));
     e.throwIf();
@@ -38,7 +46,7 @@ export default () => ({
       { req }
     ) {
       try {
-        const user = await User.getUserByUsernameOrEmail(usernameOrEmail);
+        const user = await User.getUserByUsernameOrEmail(usernameOrEmail, password);
 
         await validateUserPassword(user, password, req.t);
 

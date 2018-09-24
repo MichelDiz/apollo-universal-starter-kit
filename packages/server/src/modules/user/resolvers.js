@@ -71,7 +71,6 @@ export default pubsub => ({
       async (obj, { input }, { User, user, req: { universalCookies }, mailer, req, req: { t } }) => {
         try {
           const e = new FieldError();
-
           const userExists = await User.getUserByUsername(input.username);
           if (userExists) {
             e.setError('username', t('user:usernameIsExisted'));
@@ -139,7 +138,6 @@ export default pubsub => ({
         try {
           const e = new FieldError();
           const userExists = await User.getUserByUsername(input.username);
-
           if (userExists && userExists.id !== input.id) {
             e.setError('username', t('user:usernameIsExisted'));
           }
@@ -148,11 +146,9 @@ export default pubsub => ({
           if (emailExists && emailExists.id !== input.id) {
             e.setError('email', t('user:emailIsExisted'));
           }
-
-          if (input.password && input.password.length < 8) {
+          if (input && input.password && input.password.length < 8 && input.password !== '') {
             e.setError('password', t('user:passwordLength'));
           }
-
           e.throwIf();
 
           const userInfo = !isSelf() && isAdmin() ? input : pick(input, ['id', 'username', 'email', 'password']);

@@ -53,7 +53,7 @@ const PostEditView = ({ loading, post, match, location, subscribeToMore, editPos
         <br />
         {postObj && (
           <PostComments
-            postId={Number(match.params.id)}
+            postId={String(match.params.id)}
             comments={postObj.comments}
             subscribeToMore={subscribeToMore}
           />
